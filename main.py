@@ -18,6 +18,7 @@ while True:
 def get_staircase_probabilities(word: str, left_side: bool):
     matched_staircase_words = []
     floors = (1, 2, 3, 4)
+    target_letters = set(word)
     for floor in floors:
         current_matched_words = []
         current_floor = word[:floor:] if left_side else word[floor::]
@@ -26,9 +27,10 @@ def get_staircase_probabilities(word: str, left_side: bool):
             if fnmatch.fnmatch(allowed_word, current_floor_full_string):
                 is_valid = True
                 for i in range(5):
-                    if allowed_word[i] in word and allowed_word[i] != word[i]:
-                        is_valid = False
-                        break
+                    if current_floor_full_string[i] == wildcard_char:
+                        if allowed_word[i] in target_letters:
+                            is_valid = False
+                            break
                 if is_valid:
                     current_matched_words.append(allowed_word)
         if word in current_matched_words:
@@ -52,13 +54,19 @@ for idx in range(len(right_result) - 1, -1, -1):
     right_result[idx] = cleaned
 
 if all(left_result):
-    output_staircase = [random.choice(sublist) for sublist in left_result]
+    output_staircase = []
+    for sublist in left_result:
+        output_staircase.append(random.choice(sublist))
+    output_staircase.append(wordle_word)
     print(output_staircase)
 else:
     print("didnt work left.")
 
 if all(right_result):
-    output_staircase = [random.choice(sublist) for sublist in right_result] + [wordle_word]
+    output_staircase = []
+    for sublist in right_result:
+        output_staircase.append(random.choice(sublist))
+    output_staircase.append(wordle_word)
     print(output_staircase)
 else:
     print("didnt work right.")
