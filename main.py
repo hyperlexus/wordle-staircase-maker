@@ -1,5 +1,4 @@
 import random
-
 from get_from_github import get_wordle_answers, get_wordle_guesses
 import fnmatch
 
@@ -10,7 +9,6 @@ wordle_all = wordle_answers + wordle_guesses
 wildcard_char = "?"
 
 while True:
-    # wordle_word = input("enter your wordle word: ")
     wordle_word = "nurse"
     if wordle_word not in wordle_answers:
         print("you have reingeschissen, the word doesnt exist blud")
@@ -26,8 +24,15 @@ def get_staircase_probabilities(word: str, left_side: bool):
         current_floor_full_string = f"{current_floor:{wildcard_char}<5}" if left_side else f"{current_floor:{wildcard_char}>5}"
         for allowed_word in wordle_all:
             if fnmatch.fnmatch(allowed_word, current_floor_full_string):
-                current_matched_words.append(allowed_word)
-        current_matched_words.pop(current_matched_words.index(word))
+                is_valid = True
+                for i in range(5):
+                    if allowed_word[i] in word and allowed_word[i] != word[i]:
+                        is_valid = False
+                        break
+                if is_valid:
+                    current_matched_words.append(allowed_word)
+        if word in current_matched_words:
+            current_matched_words.pop(current_matched_words.index(word))
         matched_staircase_words.append(current_matched_words)
     return matched_staircase_words
 
@@ -46,18 +51,14 @@ for idx in range(len(right_result) - 1, -1, -1):
     seen_right.update(right_result[idx])
     right_result[idx] = cleaned
 
-output_staircase = []
-
-if left_result[3]:
-    for sublist in left_result:
-        output_staircase.append(random.choice(sublist))
+if all(left_result):
+    output_staircase = [random.choice(sublist) for sublist in left_result]
     print(output_staircase)
 else:
     print("didnt work left.")
 
-if right_result[3]:
-    for sublist in right_result:
-        output_staircase.append(random.choice(sublist))
+if all(right_result):
+    output_staircase = [random.choice(sublist) for sublist in right_result] + [wordle_word]
     print(output_staircase)
 else:
     print("didnt work right.")
